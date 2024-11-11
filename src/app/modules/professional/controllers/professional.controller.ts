@@ -90,57 +90,57 @@ export class ProfessionalController implements ProfessionalControllerInterface {
     }
   }
 
-  // @Put('put')
-  // @HttpCode(200)
-  // @ApiBearerAuth('auth')
-  // @ApiOperation({ summary: 'Put the case data' })
-  // @ApiResponse({
-  //   status: 200,
-  //   description: 'Returns a JSON with the professional data',
-  //   type: GetProfessionalResDto,
-  // })
-  // @ApiResponse({
-  //   status: 500,
-  //   description: 'Internal server error',
-  //   type: ErrorDto,
-  // })
-  // async putCase(@Request() req: Request, @Body() body: PutProfessionalReqDto) {
-  //   const logger = new Logger(ProfessionalController.name);
+  @Put('put')
+  @HttpCode(200)
+  @ApiBearerAuth('auth')
+  @ApiOperation({ summary: 'Put the case data' })
+  @ApiResponse({
+    status: 200,
+    description: 'Returns a JSON with the professional data',
+    type: GetProfessionalResDto,
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Internal server error',
+    type: ErrorDto,
+  })
+  async putCase(@Request() req: Request, @Body() body: PutProfessionalReqDto) {
+    const logger = new Logger(ProfessionalController.name);
 
-  //   try {
-  //     const user = req['crp'];
-  //     logger.log('putCase()');
-  //     return await this.professionalService.putCase(user, body);
-  //   } catch (error) {
-  //     logger.error(error);
-  //     throw new HttpException(error.message, error.getStatus());
-  //   }
-  // }
+    try {
+      const headers = req.headers as unknown as AxiosHeaders;
+      logger.log('putCase()');
+      return await this.professionalService.putCase(headers, body);
+    } catch (error) {
+      logger.error(error);
+      throw new HttpException(error.message, error.getStatus());
+    }
+  }
 
-  // @Delete('delete/:uuid')
-  // @HttpCode(200)
-  // @ApiBearerAuth('auth')
-  // @ApiOperation({ summary: 'Delete the case history data' })
-  // @ApiResponse({
-  //   status: 200,
-  //   description: 'Returns a JSON with the professional status',
-  //   type: DeleteProfessionalResDto,
-  // })
-  // @ApiResponse({
-  //   status: 500,
-  //   description: 'Internal server error',
-  //   type: ErrorDto,
-  // })
-  // async deleteHistory(@Request() req: Request, @Param('uuid') uuid: string) {
-  //   const logger = new Logger(ProfessionalController.name);
+  @Delete('delete/:uuid')
+  @HttpCode(200)
+  @ApiBearerAuth('auth')
+  @ApiOperation({ summary: 'Delete the case history data' })
+  @ApiResponse({
+    status: 200,
+    description: 'Returns a JSON with the professional status',
+    type: DeleteProfessionalResDto,
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Internal server error',
+    type: ErrorDto,
+  })
+  async deleteHistory(@Request() req: Request, @Param('uuid') uuid: string) {
+    const logger = new Logger(ProfessionalController.name);
 
-  //   try {
-  //     const user = req['crp'];      
-  //     logger.log('deleteHistory()');
-  //     return await this.professionalService.deleteHistory(user, uuid);
-  //   } catch (error) {
-  //     logger.error(error);
-  //     throw new HttpException(error.message, error.getStatus());
-  //   }
-  // }
+    try {
+      const headers = req.headers as unknown as AxiosHeaders;     
+      logger.log('deleteHistory()');
+      return await this.professionalService.deleteHistory(headers, uuid);
+    } catch (error) {
+      logger.error(error);
+      throw new HttpException(error.message, error.getStatus());
+    }
+  }
 }

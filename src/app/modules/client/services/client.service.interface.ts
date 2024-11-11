@@ -7,6 +7,9 @@ import { PutClientReqDto } from '@app/modules/client/dtos/request/put-client.req
 import { AxiosHeaders } from 'axios';
 
 export interface ClientServiceInterface {
-    getPatientsRDP(headers: AxiosHeaders,filter?: GetClietRdpReqDto): Promise<GetClientResDto>;
-    getPatientsRDP(headers: AxiosHeaders,bfilter?: GetClietRdpReqDto): Promise<GetClientResDto>;
+    getPatientsRDP(headers: AxiosHeaders, filter?: GetClietRdpReqDto): Promise<GetClientResDto>;
+    getPatientsRDP(headers: AxiosHeaders, filter?: GetClietRdpReqDto): Promise<GetClientResDto>;
+    postRDP(headers: AxiosHeaders, body: PostClientReqDto): Promise<GetClientResDto>
+    putRDP(headers: AxiosHeaders, body: PutClientReqDto): Promise<GetClientResDto>
+    deleteRPD(headers: AxiosHeaders, uuid: string): Promise<DeleteClientResDto>
 }

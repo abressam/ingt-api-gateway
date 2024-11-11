@@ -91,4 +91,140 @@ export class AppointmentController implements AppointmentControllerInterface {
       throw new HttpException(error.message, error.getStatus());
     }
   }
+
+  @Post('post')
+  @HttpCode(200)
+  @ApiBearerAuth('auth')
+  @ApiOperation({ summary: 'Post the appointment data' })
+  @ApiResponse({
+    status: 200,
+    description: 'Returns a JSON with the appointment data',
+    type: GetAppointmentResDto,
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Internal server error',
+    type: ErrorDto,
+  })
+  async postAppointment(@Request() req: Request, @Body() body: PostAppointmentReqDto) {
+    const logger = new Logger(AppointmentController.name);
+
+    try {
+      const headers = req.headers as unknown as AxiosHeaders;
+      logger.log('postAppointment()');
+      return await this.appointmentService.postAppointment(headers, body);
+    } catch (error) {
+      logger.error(error);
+      throw new HttpException(error.message, error.getStatus());
+    }
+  }
+
+  @Put('put')
+  @HttpCode(200)
+  @ApiBearerAuth('auth')
+  @ApiOperation({ summary: 'Put the appointment data' })
+  @ApiResponse({
+    status: 200,
+    description: 'Returns a JSON with the appointment data',
+    type: GetAppointmentResDto,
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Internal server error',
+    type: ErrorDto,
+  })
+  async putAppointment(@Request() req: Request, @Body() body: PutAppointmentReqDto) {
+    const logger = new Logger(AppointmentController.name);
+
+    try {
+      const headers = req.headers as unknown as AxiosHeaders;
+      logger.log('putAppointment()');
+      return await this.appointmentService.putAppointment(headers, body);
+    } catch (error) {
+      logger.error(error);
+      throw new HttpException(error.message, error.getStatus());
+    }
+  }
+
+  @Patch('patch/link-appointment/:uuid')
+  @HttpCode(200)
+  @ApiBearerAuth('auth')
+  @ApiOperation({ summary: 'Get all the client data appointments' })
+  @ApiResponse({
+    status: 200,
+    description: 'Returns a JSON with the data from all client data appointments',
+    type: GetAppointmentResDto,
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Internal server error',
+    type: ErrorDto,
+  })
+  async patchLinkAppointment(@Request() req: Request, @Param('uuid') uuid: string) {
+    const logger = new Logger(AppointmentController.name);
+
+    try {
+      const headers = req.headers as unknown as AxiosHeaders;
+      logger.log('patchLinkAppointment()');
+      return await this.appointmentService.patchLinkAppointment(headers, uuid);
+    } catch (error) {
+      logger.error(error);
+      throw new HttpException(error.message, error.getStatus());
+    }
+  }
+
+  @Patch('patch/cancel-appointment/:uuid')
+  @HttpCode(200)
+  @ApiBearerAuth('auth')
+  @ApiOperation({ summary: 'Patch the appointment data to cancel a patientId' })
+  @ApiResponse({
+    status: 200,
+    description: 'Returns a JSON with the appointment status',
+    type: GetAppointmentResDto,
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Internal server error',
+    type: ErrorDto,
+  })
+  async patchCancelAppointment(@Request() req: Request, @Param('uuid') uuid: string) {
+    const logger = new Logger(AppointmentController.name);
+
+    try {
+      const headers = req.headers as unknown as AxiosHeaders;     
+      logger.log('patchCancelAppointment()');
+      return await this.appointmentService.patchCancelAppointment(headers, uuid);
+    } catch (error) {
+      logger.error(error);
+      throw new HttpException(error.message, error.getStatus());
+    }
+  }
+
+  @Delete('delete/:uuid')
+  @HttpCode(200)
+  @ApiBearerAuth('auth')
+  @ApiOperation({ summary: 'Delete the appointment data' })
+  @ApiResponse({
+    status: 200,
+    description: 'Returns a JSON with the appointment status',
+    type: DeleteAppointmentResDto,
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Internal server error',
+    type: ErrorDto,
+  })
+  async deleteAppointment(@Request() req: Request, @Param('uuid') uuid: string) {
+    const logger = new Logger(AppointmentController.name);
+
+    try {
+      const headers = req.headers as unknown as AxiosHeaders;      
+      logger.log('deleteAppointment()');
+      return await this.appointmentService.deleteAppointment(headers, uuid);
+    } catch (error) {
+      logger.error(error);
+      throw new HttpException(error.message, error.getStatus());
+    }
+  }
+
 }

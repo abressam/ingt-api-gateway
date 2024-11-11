@@ -93,4 +93,86 @@ export class ClientController implements ClientControllerInterface {
         throw new HttpException(error.message, error.getStatus());
     }
   }
+
+  @Post('post')
+  @HttpCode(200)
+  @ApiBearerAuth('auth')
+  @ApiOperation({ summary: 'Post the client data' })
+  @ApiResponse({
+    status: 200,
+    description: 'Returns a JSON with the client data',
+    type: GetClientResDto,
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Internal server error',
+    type: ErrorDto,
+  })
+  async postRDP(@Request() req: Request, @Body() body: PostClientReqDto) {
+    const logger = new Logger(ClientController.name);
+
+    try {
+        const headers = req.headers as unknown as AxiosHeaders;
+        logger.log('postRDP()');
+        return await this.clientService.postRDP(headers, body);
+    } catch (error) {
+        logger.error(error);
+        throw new HttpException(error.message, error.getStatus());
+    }
+  }
+
+  @Put('put')
+  @HttpCode(200)
+  @ApiBearerAuth('auth')
+  @ApiOperation({ summary: 'Put the user data' })
+  @ApiResponse({
+    status: 200,
+    description: 'Returns a JSON with the user data',
+    type: GetClientResDto,
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Internal server error',
+    type: ErrorDto,
+  })
+  async putRDP(@Request() req: Request, @Body() body: PutClientReqDto) {
+    const logger = new Logger(ClientController.name);
+
+    try {
+        const headers = req.headers as unknown as AxiosHeaders;
+        logger.log('putRDP()');
+        return await this.clientService.putRDP(headers, body);
+    } catch (error) {
+        logger.error(error);
+        throw new HttpException(error.message, error.getStatus());
+    }
+  }
+
+  @Delete('delete/:uuid')
+  @HttpCode(200)
+  @ApiBearerAuth('auth')
+  @ApiOperation({ summary: 'Delete the user data' })
+  @ApiResponse({
+    status: 200,
+    description: 'Returns a JSON with the user status',
+    type: DeleteClientResDto,
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Internal server error',
+    type: ErrorDto,
+  })
+  async deleteRPD(@Request() req: Request, @Param('uuid') uuid: string) {
+    const logger = new Logger(ClientController.name);
+
+    try {
+        const headers = req.headers as unknown as AxiosHeaders;
+        logger.log('deleteRPD()');
+        return await this.clientService.deleteRPD(headers, uuid);
+    } catch (error) {
+        logger.error(error);
+        throw new HttpException(error.message, error.getStatus());
+    }
+  }
+
 }

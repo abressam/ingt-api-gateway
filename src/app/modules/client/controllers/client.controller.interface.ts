@@ -6,6 +6,15 @@ import { PutClientReqDto } from '@app/modules/client/dtos/request/put-client.req
 import { GetClietRdpReqDto } from '@app/modules/client//dtos/request/get-client-filter-rdp-req.dto';
 
 export interface ClientControllerInterface {
-    getPatientsRDP(req: Request, filter?: GetClietRdpReqDto): Promise<GetClientResDto>;
-    getMyRDP(req: Request, filter?: GetClietMyRdpsReqDto): Promise<GetClientResDto>;
+    getPatientsRDP(
+        req: Request,
+        filter?: GetClietRdpReqDto
+    ): Promise<GetClientResDto>;
+    getMyRDP(
+        req: Request,
+        filter?: GetClietMyRdpsReqDto
+    ): Promise<GetClientResDto>;
+    postRDP(req: Request, body: PostClientReqDto): Promise<GetClientResDto>;
+    putRDP(req: Request, body: PutClientReqDto): Promise<GetClientResDto>;
+    deleteRPD(req: Request, param: string ): Promise<DeleteClientResDto>;
 }

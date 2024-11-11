@@ -7,6 +7,6 @@ import { PutProfessionalReqDto } from '@app/modules/professional/dtos/requests/p
 export interface ProfessionalControllerInterface {
     getPacientCase(req: Request, filter?: GetProfessionalHistoryByPacientDto): Promise<GetProfessionalResDto>;
     postCase(req: Request, body: PostProfessionalReqDto): Promise<GetProfessionalResDto>;
-    // putCase(req: Request, body: PutProfessionalReqDto): Promise<GetProfessionalResDto>;
-    // deleteHistory(req: Request, uuid: string ): Promise<DeleteProfessionalResDto>;
+    putCase(req: Request, body: PutProfessionalReqDto): Promise<GetProfessionalResDto>;
+    deleteHistory(req: Request, uuid: string ): Promise<DeleteProfessionalResDto>;
 }

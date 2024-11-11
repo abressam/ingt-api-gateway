@@ -8,9 +8,9 @@ import { AxiosHeaders } from 'axios';
 export interface AppointmentServiceInterface {
     getAppointment(headers: AxiosHeaders, filter: GetAppointmentReqDto): Promise<GetAppointmentResDto>;
     getMyAppointments(headers: AxiosHeaders): Promise<GetAppointmentResDto>;
-    // postAppointment(crp: string, body: PostAppointmentReqDto): Promise<GetAppointmentResDto>;
-    // putAppointment(crp: string, body: PutAppointmentReqDto): Promise<GetAppointmentResDto>;
-    // patchLinkAppointment(patientId: string, uuid: string): Promise<GetAppointmentResDto>;
-    // patchCancelAppointment(uuid: string, patientId: string): Promise<GetAppointmentResDto>;
-    // deleteAppointment(crp: string, uuid: string): Promise<DeleteAppointmentResDto>;
+    postAppointment(headers: AxiosHeaders, body: PostAppointmentReqDto): Promise<GetAppointmentResDto>;
+    putAppointment(headers: AxiosHeaders, body: PutAppointmentReqDto): Promise<GetAppointmentResDto>;
+    patchLinkAppointment(headers: AxiosHeaders, uuid: string): Promise<GetAppointmentResDto>;
+    patchCancelAppointment(headers: AxiosHeaders, uuid: string): Promise<GetAppointmentResDto>;
+    deleteAppointment(headers: AxiosHeaders, uuid: string): Promise<DeleteAppointmentResDto>;
 }

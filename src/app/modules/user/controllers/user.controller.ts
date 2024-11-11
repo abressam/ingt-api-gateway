@@ -57,7 +57,7 @@ export class UserController implements UserControllerInterface {
       return response.data;
     } catch (error) {
       logger.error(error);
-      throw new HttpException(error.response.data.message, error.response.status);
+      throw new HttpException(error.message, error.getStatus());
     }
   }
 
@@ -82,7 +82,7 @@ export class UserController implements UserControllerInterface {
       return this.userService.getUsersByCrp();
     } catch (error) {
       logger.error(error);
-      throw new HttpException(error.response.data.message, error.response.status);
+      throw new HttpException(error.message, error.getStatus());
     }
   }
 
@@ -109,8 +109,86 @@ export class UserController implements UserControllerInterface {
       return await this.userService.getUsersByPatientId(headers);
     } catch (error) {
       logger.error(error);
-      throw new HttpException(error.response.data.message, error.response.status);
+      throw new HttpException(error.message, error.getStatus());
     }
   }
   
+  @Post('post')
+  @HttpCode(200)
+  @ApiOperation({ summary: 'Post the user data' })
+  @ApiResponse({
+    status: 200,
+    description: 'Returns a JSON with the user data',
+    type: GetUserResDto,
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Internal server error',
+    type: ErrorDto,
+  })
+  async postUser(@Body() body: PostUserReqDto) {
+    const logger = new Logger(UserController.name);
+
+    try {
+      logger.log('postUser()');
+      return await this.userService.postUser(body);
+    } catch (error) {
+      logger.error(error);
+      throw new HttpException(error.message, error.getStatus());
+    }
+  }
+
+  @Put('put')
+  @HttpCode(200)
+  @ApiBearerAuth('auth')
+  @ApiOperation({ summary: 'Put the user data' })
+  @ApiResponse({
+    status: 200,
+    description: 'Returns a JSON with the user data',
+    type: GetUserResDto,
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Internal server error',
+    type: ErrorDto,
+  })
+  async putUser(@Request() req: Request, @Body() body: PutUserReqDto) {
+    const logger = new Logger(UserController.name);
+
+    try {
+      const headers = req.headers as unknown as AxiosHeaders;
+      logger.log('putUser()');
+      return await this.userService.putUser(headers, body);
+    } catch (error) {
+      logger.error(error);
+      throw new HttpException(error.message, error.getStatus());
+    }
+  }
+
+  @Delete('delete')
+  @HttpCode(200)
+  @ApiBearerAuth('auth')
+  @ApiOperation({ summary: 'Delete the user data' })
+  @ApiResponse({
+    status: 200,
+    description: 'Returns a JSON with the user status',
+    type: DeleteUserResDto,
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Internal server error',
+    type: ErrorDto,
+  })
+  async deleteUser(@Request() req: Request) {
+    const logger = new Logger(UserController.name);
+
+    try {
+      const headers = req.headers as unknown as AxiosHeaders;     
+      logger.log('deleteUser()');
+      return await this.userService.deleteUser(headers);
+    } catch (error) {
+      logger.error(error);
+      throw new HttpException(error.message, error.getStatus());
+    }
+  }
 }

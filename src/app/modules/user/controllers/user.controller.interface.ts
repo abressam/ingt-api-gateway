@@ -9,4 +9,7 @@ export interface UserControllerInterface {
   getUser(req: Request): Promise<GetUserResDto>;
   getUsersByCrp(): Promise<GetUsersByCrpResDto>;
   getUsersByPatientId(req: Request): Promise<GetUsersByPatientIdResDto>;
+  postUser(body: PostUserReqDto): Promise<GetUserResDto>;
+  putUser(req: Request, body: PutUserReqDto): Promise<GetUserResDto>;
+  deleteUser(req: Request): Promise<DeleteUserResDto>;
 }

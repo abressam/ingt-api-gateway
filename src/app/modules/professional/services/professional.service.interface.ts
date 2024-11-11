@@ -8,6 +8,6 @@ import { AxiosHeaders } from 'axios';
 export interface ProfessionalServiceInterface {
     getPacientCase(headers: AxiosHeaders, filter: GetProfessionalHistoryByPacientDto): Promise<GetProfessionalResDto>;
     postCase(headers: AxiosHeaders, body: PostProfessionalReqDto): Promise<GetProfessionalResDto>;
-    // putCase(crp: string, body: PutProfessionalReqDto): Promise<GetProfessionalResDto>;
-    // deleteHistory(crp: string, uuid: string): Promise<DeleteProfessionalResDto>;
+    putCase(headers: AxiosHeaders, body: PutProfessionalReqDto): Promise<GetProfessionalResDto>;
+    deleteHistory(headers: AxiosHeaders, uuid: string): Promise<DeleteProfessionalResDto>;
 }

@@ -4,7 +4,6 @@ import { ConfigService } from '@nestjs/config';
 import { HttpService } from '@nestjs/axios';
 import { lastValueFrom } from 'rxjs';
 import { AxiosHeaders } from 'axios';
-import { AppointmentDto } from '@app/modules/appointment/dtos/appointment.dto';
 import { DeleteAppointmentResDto } from '@app/modules/appointment/dtos/responses/delete-appointment-res.dto';
 import { GetAppointmentResDto } from '@app/modules/appointment/dtos/responses/get-appointment-res.dto';
 import { GetAppointmentReqDto } from '@app/modules/appointment/dtos/requests/get-appointment-req.dto';
@@ -62,25 +61,27 @@ export class AppointmentService implements AppointmentServiceInterface {
   }
 
   async patchLinkAppointment(headers: AxiosHeaders, uuid: string): Promise<GetAppointmentResDto> {
-    const url = this.configService.get('MS_APPOINTMENT_URL') + '/appointment/patch/link-appointment/:uuid';
+    const url = `${this.configService.get('MS_APPOINTMENT_URL')}/appointment/patch/link-appointment/${uuid}`;
     const authHeaders = createAuthHeader(headers);
-    const response = await lastValueFrom(this.httpService.patch<GetAppointmentResDto>(url, { params: uuid, headers: authHeaders }));
+    
+    const response = await lastValueFrom(this.httpService.patch<GetAppointmentResDto>(url, null, { headers: authHeaders }));
 
     return response.data;
   }
 
   async patchCancelAppointment(headers: AxiosHeaders, uuid: string): Promise<GetAppointmentResDto> {
-    const url = this.configService.get('MS_APPOINTMENT_URL') + '/appointment/patch/cancel-appointment/:uuid';
+    const url = `${this.configService.get('MS_APPOINTMENT_URL')}/appointment/patch/cancel-appointment/${uuid}`;
     const authHeaders = createAuthHeader(headers);
-    const response = await lastValueFrom(this.httpService.put<GetAppointmentResDto>(url, { params: uuid, headers: authHeaders }));
+
+    const response = await lastValueFrom(this.httpService.patch<GetAppointmentResDto>(url, null, { headers: authHeaders }));
 
     return response.data;
   }
 
   async deleteAppointment(headers: AxiosHeaders, uuid: string): Promise<DeleteAppointmentResDto> {
-    const url = this.configService.get('MS_APPOINTMENT_URL') + '/appointment/patch/cancel-appointment/:uuid';
+    const url = `${this.configService.get('MS_APPOINTMENT_URL')}/appointment/delete/${uuid}`;
     const authHeaders = createAuthHeader(headers);
-    const response = await lastValueFrom(this.httpService.put<DeleteAppointmentResDto>(url, { params: uuid, headers: authHeaders }));
+    const response = await lastValueFrom(this.httpService.delete<DeleteAppointmentResDto>(url, { headers: authHeaders }));
 
     return response.data;
   }

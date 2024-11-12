@@ -9,7 +9,8 @@ import { GetAppointmentResDto } from '@app/modules/appointment/dtos/responses/ge
 import { GetAppointmentReqDto } from '@app/modules/appointment/dtos/requests/get-appointment-req.dto';
 import { PostAppointmentReqDto } from '@app/modules/appointment/dtos/requests/post-appointment-req.dto';
 import { PutAppointmentReqDto } from '@app/modules/appointment/dtos/requests/put-appointment-req.dto';
-
+import { Kafka } from 'kafkajs';
+import { ProducerService } from '@app/modules/kafka/services/producer.service';
 
 function createAuthHeader(headers: AxiosHeaders): AxiosHeaders {
   const token = headers['authorization'] || headers['Authorization'];
@@ -26,6 +27,7 @@ export class AppointmentService implements AppointmentServiceInterface {
   constructor(
     private readonly httpService: HttpService,
     private readonly configService: ConfigService,
+    private readonly producerService: ProducerService,
   ) {}
 
   async getAppointment(headers: AxiosHeaders, filter: GetAppointmentReqDto): Promise<GetAppointmentResDto> {
@@ -60,13 +62,32 @@ export class AppointmentService implements AppointmentServiceInterface {
     return response.data;
   }
 
-  async patchLinkAppointment(headers: AxiosHeaders, uuid: string): Promise<GetAppointmentResDto> {
+  async patchLinkAppointment(headers: AxiosHeaders, uuid: string): Promise<any> {
     const url = `${this.configService.get('MS_APPOINTMENT_URL')}/appointment/patch/link-appointment/${uuid}`;
     const authHeaders = createAuthHeader(headers);
     
     const response = await lastValueFrom(this.httpService.patch<GetAppointmentResDto>(url, null, { headers: authHeaders }));
 
-    return response.data;
+    // Filtra a resposta para evitar incluir referências circulares
+    const messageData = {
+      url,
+      method: 'post',
+      headers: authHeaders,
+      data: response.data
+    };
+
+    // Prepara a mensagem para o Kafka
+    const record = {
+      topic: 'meu-teste',  // Nome do tópico no Kafka
+      messages: [
+        { value: JSON.stringify(messageData) },  // Envia apenas os dados filtrados
+      ],
+    };
+
+    // Envia a mensagem para o Kafka
+    await this.producerService.produce(record);
+
+    return this.configService.get('MESSAGE_SUCCESS');
   }
 
   async patchCancelAppointment(headers: AxiosHeaders, uuid: string): Promise<GetAppointmentResDto> {

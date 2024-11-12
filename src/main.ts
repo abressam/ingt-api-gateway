@@ -1,5 +1,4 @@
 import { NestFactory } from '@nestjs/core';
-import { KafkaService } from '@app/modules/kafka/services/kafka.service'; 
 import { DocumentBuilder, OpenAPIObject, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
@@ -36,10 +35,6 @@ class App {
 
   async bootstrap() {
     this.app = await NestFactory.create(AppModule, {});
-
-    // Iniciar a escuta das mensagens Kafka
-    const kafkaService = this.app.get(KafkaService);
-    kafkaService.listenToMessages();
 
     this.config = this.app.get(ConfigService);
     this.app.enableCors(this.config.get('cors'));

@@ -7,15 +7,15 @@ export class PutClientReqDto {
     @IsNotEmpty()
     uuid: string;
 
-    @ApiProperty()
+    @ApiProperty({ type: [String] })
     @IsOptional()
-    @IsString()
-    emotion?: string;
+    @IsString({ each: true })
+    emotion?: string[];
 
-    @ApiProperty()
+    @ApiProperty({ type: [String] })
     @IsOptional()
-    @IsString()
-    physiologicalReaction?: string;
+    @IsString({ each: true })
+    physiologicalReaction?: string[];
   
     @ApiProperty()
     @IsOptional()
@@ -27,8 +27,8 @@ export class PutClientReqDto {
     @IsString()
     thought?: string;
   
-    @ApiProperty()
+    @ApiProperty({ type: [String] })
     @IsOptional()
-    @IsString()
-    behavior?: string;
+    @IsString({ each: true })
+    behavior?: string[];
 }

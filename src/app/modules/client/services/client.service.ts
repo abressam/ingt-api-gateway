@@ -65,10 +65,10 @@ export class ClientService implements ClientServiceInterface {
     }
     
     async deleteRPD(headers: AxiosHeaders, uuid: string): Promise<DeleteClientResDto> {
-        const url = this.configService.get('MS_CLIENT_URL') + '/client/delete/:uuid';
+        const url = `${this.configService.get('MS_CLIENT_URL')}/client/delete/${uuid}`;
         const authHeaders = createAuthHeader(headers);
 
-        const response = await lastValueFrom(this.httpService.delete<DeleteClientResDto>(url, { params: uuid, headers: authHeaders }));
+        const response = await lastValueFrom(this.httpService.delete<DeleteClientResDto>(url, { headers: authHeaders }));
     
         return response.data;
     }

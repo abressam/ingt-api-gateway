@@ -55,10 +55,10 @@ export class ProfessionalService implements ProfessionalServiceInterface {
   }
 
   async deleteHistory(headers: AxiosHeaders, uuid: string): Promise<DeleteProfessionalResDto> {
-    const url = this.configService.get('services.professionalService.url') + '/professional/delete/:uuid';
+    const url = `${this.configService.get('services.professionalService.url')}/professional/delete/${uuid}`;
     const authHeaders = createAuthHeader(headers);
 
-    const response = await lastValueFrom(this.httpService.delete<DeleteProfessionalResDto>(url, { params: uuid, headers: authHeaders }));
+    const response = await lastValueFrom(this.httpService.delete<DeleteProfessionalResDto>(url, { headers: authHeaders }));
 
     return response.data;
   }

@@ -84,32 +84,7 @@ export class AppointmentService implements AppointmentServiceInterface {
   
     return { success: true, message: 'Appointment request registered for future processing' };
 
-    // try {
-    //   // Tenta enviar a requisição diretamente para o MS
-    //   const response = await lastValueFrom(this.httpService.patch<GetAppointmentResDto>(url, null, { headers: authHeaders }));
-
-    //   return response.data;
-    // } catch (error) {
-    //   // Caso o MS esteja fora do ar, registra a requisição no Kafka
-    //   console.error('MS offline, registrando requisição na fila Kafka...', error);
-
-    //   // Registra a requisição no Kafka para reprocessamento posterior
-    //   await this.producerService.produce({
-    //     topic: 'meu-teste',
-    //     messages: [{ value: JSON.stringify(messageData) }],
-    //   });
-    // }
-
-    // return { success: true, message: 'Appointment request registered for future processing' };
   }
-
-    // Método público para enviar PATCH
-    async sendPatchRequest(url: string, headers: AxiosHeaders, data?: any): Promise<GetAppointmentResDto> {
-      const response = await lastValueFrom(
-        this.httpService.patch<GetAppointmentResDto>(url, data, { headers })
-      );
-      return response.data;
-    }
 
   async patchCancelAppointment(headers: AxiosHeaders, uuid: string): Promise<GetAppointmentResDto> {
     const url = `${this.configService.get('MS_APPOINTMENT_URL')}/appointment/patch/cancel-appointment/${uuid}`;

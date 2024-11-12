@@ -9,8 +9,9 @@ import { GetAppointmentResDto } from '@app/modules/appointment/dtos/responses/ge
 import { GetAppointmentReqDto } from '@app/modules/appointment/dtos/requests/get-appointment-req.dto';
 import { PostAppointmentReqDto } from '@app/modules/appointment/dtos/requests/post-appointment-req.dto';
 import { PutAppointmentReqDto } from '@app/modules/appointment/dtos/requests/put-appointment-req.dto';
-import { Kafka } from 'kafkajs';
 import { ProducerService } from '@app/modules/kafka/services/producer.service';
+import { ConsumerService } from '@app/modules/kafka/services/consumer.service';
+import { v4 as uuidv4 } from 'uuid';
 
 function createAuthHeader(headers: AxiosHeaders): AxiosHeaders {
   const token = headers['authorization'] || headers['Authorization'];
@@ -28,6 +29,7 @@ export class AppointmentService implements AppointmentServiceInterface {
     private readonly httpService: HttpService,
     private readonly configService: ConfigService,
     private readonly producerService: ProducerService,
+    private readonly consumerService: ConsumerService,
   ) {}
 
   async getAppointment(headers: AxiosHeaders, filter: GetAppointmentReqDto): Promise<GetAppointmentResDto> {
@@ -66,28 +68,39 @@ export class AppointmentService implements AppointmentServiceInterface {
     const url = `${this.configService.get('MS_APPOINTMENT_URL')}/appointment/patch/link-appointment/${uuid}`;
     const authHeaders = createAuthHeader(headers);
     
-    const response = await lastValueFrom(this.httpService.patch<GetAppointmentResDto>(url, null, { headers: authHeaders }));
+    const correlationId = uuidv4();
 
     // Filtra a resposta para evitar incluir referências circulares
-    const messageData = {
+    const messageData: { 
+      url: string, 
+      method: string, 
+      headers: AxiosHeaders, 
+      correlationId: string,
+      data?: any // Adiciona o 'data' como opcional
+    } = {
       url,
-      method: 'post',
+      method: 'patch',
       headers: authHeaders,
-      data: response.data
+      correlationId,
     };
 
-    // Prepara a mensagem para o Kafka
-    const record = {
-      topic: 'meu-teste',  // Nome do tópico no Kafka
-      messages: [
-        { value: JSON.stringify(messageData) },  // Envia apenas os dados filtrados
-      ],
-    };
+    try {
+      // Tenta enviar a requisição diretamente para o MS
+      const response = await lastValueFrom(this.httpService.patch<GetAppointmentResDto>(url, null, { headers: authHeaders }));
 
-    // Envia a mensagem para o Kafka
-    await this.producerService.produce(record);
+      return response.data;
+    } catch (error) {
+      // Caso o MS esteja fora do ar, registra a requisição no Kafka
+      console.error('MS offline, registrando requisição na fila Kafka...', error);
 
-    return this.configService.get('MESSAGE_SUCCESS');
+      // Registra a requisição no Kafka para reprocessamento posterior
+      await this.producerService.produce({
+        topic: 'meu-teste',
+        messages: [{ value: JSON.stringify(messageData) }],
+      });
+    }
+
+    return { success: true, message: 'Appointment request registered for future processing' };
   }
 
   async patchCancelAppointment(headers: AxiosHeaders, uuid: string): Promise<GetAppointmentResDto> {
@@ -105,5 +118,22 @@ export class AppointmentService implements AppointmentServiceInterface {
     const response = await lastValueFrom(this.httpService.delete<DeleteAppointmentResDto>(url, { headers: authHeaders }));
 
     return response.data;
+  }
+
+  // Função para aguardar a confirmação do Kafka
+  async waitForKafkaResponse(correlationId: string): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      const timeout = setTimeout(() => {
+        reject('Timeout de espera da resposta do Kafka');
+      }, 20000); // Timeout de 10 segundos
+
+      // Aqui, você deve configurar um "listener" que será chamado quando o Kafka processar a mensagem
+      this.consumerService.onMessageProcessed((id) => {
+        if (id === correlationId) {
+          clearTimeout(timeout);
+          resolve(true);
+        }
+      });
+    });
   }
 }

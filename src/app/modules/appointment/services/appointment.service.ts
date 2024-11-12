@@ -11,7 +11,6 @@ import { PostAppointmentReqDto } from '@app/modules/appointment/dtos/requests/po
 import { PutAppointmentReqDto } from '@app/modules/appointment/dtos/requests/put-appointment-req.dto';
 import { ProducerService } from '@app/modules/kafka/services/producer.service';
 import { ConsumerService } from '@app/modules/kafka/services/consumer.service';
-import { v4 as uuidv4 } from 'uuid';
 
 function createAuthHeader(headers: AxiosHeaders): AxiosHeaders {
   const token = headers['authorization'] || headers['Authorization'];
@@ -68,40 +67,49 @@ export class AppointmentService implements AppointmentServiceInterface {
     const url = `${this.configService.get('MS_APPOINTMENT_URL')}/appointment/patch/link-appointment/${uuid}`;
     const authHeaders = createAuthHeader(headers);
     
-    const correlationId = uuidv4();
-
-    // Filtra a resposta para evitar incluir referências circulares
     const messageData: { 
       url: string, 
       method: string, 
       headers: AxiosHeaders, 
-      correlationId: string,
-      data?: any // Adiciona o 'data' como opcional
     } = {
       url,
       method: 'patch',
       headers: authHeaders,
-      correlationId,
     };
 
-    try {
-      // Tenta enviar a requisição diretamente para o MS
-      const response = await lastValueFrom(this.httpService.patch<GetAppointmentResDto>(url, null, { headers: authHeaders }));
-
-      return response.data;
-    } catch (error) {
-      // Caso o MS esteja fora do ar, registra a requisição no Kafka
-      console.error('MS offline, registrando requisição na fila Kafka...', error);
-
-      // Registra a requisição no Kafka para reprocessamento posterior
-      await this.producerService.produce({
-        topic: 'meu-teste',
-        messages: [{ value: JSON.stringify(messageData) }],
-      });
-    }
-
+    await this.producerService.produce({
+      topic: 'meu-teste',
+      messages: [{ value: JSON.stringify(messageData) }],
+    });
+  
     return { success: true, message: 'Appointment request registered for future processing' };
+
+    // try {
+    //   // Tenta enviar a requisição diretamente para o MS
+    //   const response = await lastValueFrom(this.httpService.patch<GetAppointmentResDto>(url, null, { headers: authHeaders }));
+
+    //   return response.data;
+    // } catch (error) {
+    //   // Caso o MS esteja fora do ar, registra a requisição no Kafka
+    //   console.error('MS offline, registrando requisição na fila Kafka...', error);
+
+    //   // Registra a requisição no Kafka para reprocessamento posterior
+    //   await this.producerService.produce({
+    //     topic: 'meu-teste',
+    //     messages: [{ value: JSON.stringify(messageData) }],
+    //   });
+    // }
+
+    // return { success: true, message: 'Appointment request registered for future processing' };
   }
+
+    // Método público para enviar PATCH
+    async sendPatchRequest(url: string, headers: AxiosHeaders, data?: any): Promise<GetAppointmentResDto> {
+      const response = await lastValueFrom(
+        this.httpService.patch<GetAppointmentResDto>(url, data, { headers })
+      );
+      return response.data;
+    }
 
   async patchCancelAppointment(headers: AxiosHeaders, uuid: string): Promise<GetAppointmentResDto> {
     const url = `${this.configService.get('MS_APPOINTMENT_URL')}/appointment/patch/cancel-appointment/${uuid}`;
@@ -118,22 +126,5 @@ export class AppointmentService implements AppointmentServiceInterface {
     const response = await lastValueFrom(this.httpService.delete<DeleteAppointmentResDto>(url, { headers: authHeaders }));
 
     return response.data;
-  }
-
-  // Função para aguardar a confirmação do Kafka
-  async waitForKafkaResponse(correlationId: string): Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      const timeout = setTimeout(() => {
-        reject('Timeout de espera da resposta do Kafka');
-      }, 20000); // Timeout de 10 segundos
-
-      // Aqui, você deve configurar um "listener" que será chamado quando o Kafka processar a mensagem
-      this.consumerService.onMessageProcessed((id) => {
-        if (id === correlationId) {
-          clearTimeout(timeout);
-          resolve(true);
-        }
-      });
-    });
   }
 }

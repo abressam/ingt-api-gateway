@@ -9,6 +9,6 @@ import { ConsumerService } from '@app/modules/kafka/services/consumer.service';
   imports: [HttpModule],
   providers: [AppointmentService, ProducerService, ConsumerService],
   controllers: [AppointmentController],
-  exports:[ProducerService, ConsumerService]
+  exports: [AppointmentService, ProducerService, ConsumerService]
 })
-export class AppointmentModule  {}
+export class AppointmentModule {}
